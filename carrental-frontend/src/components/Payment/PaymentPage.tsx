@@ -60,11 +60,11 @@ const PaymentPage: React.FC = () => {
         // 2. Create Order in Backend & Fetch Key
         const amount = booking.advanceAmount || booking.totalAmount / 3;
         const [orderResponse, keyResponse] = await Promise.all([
-          axios.post('http://localhost:8080/api/payments/create-order', {
+          axios.post('https://carrental-system-mg-production.up.railway.app/api/payments/create-order', {
             amount: amount,
             bookingNumber: booking.bookingNumber || `BK-${booking.id}`
           }),
-          axios.get('http://localhost:8080/api/payments/razorpay-key')
+          axios.get('https://carrental-system-mg-production.up.railway.app/api/payments/razorpay-key')
         ]);
 
         const { orderId } = orderResponse.data;
@@ -81,7 +81,7 @@ const PaymentPage: React.FC = () => {
           handler: async (response: any) => {
             // 4. Verify Payment in Backend
             try {
-              const verifyRes = await axios.post('http://localhost:8080/api/payments/verify-signature', {
+              const verifyRes = await axios.post('https://carrental-system-mg-production.up.railway.app/api/payments/verify-signature', {
                 orderId: response.razorpay_order_id,
                 paymentId: response.razorpay_payment_id,
                 signature: response.razorpay_signature

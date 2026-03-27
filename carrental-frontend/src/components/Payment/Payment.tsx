@@ -96,7 +96,7 @@ const Payment: React.FC = () => {
         status: 'PENDING'
       };
 
-      const bookingResponse = await fetch('http://localhost:8080/api/bookings', {
+      const bookingResponse = await fetch('https://carrental-system-mg-production.up.railway.app/api/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ const Payment: React.FC = () => {
         status: 'SUCCESS'
       };
 
-      const paymentResponse = await fetch(`http://localhost:8080/api/payments/advance/${bookingId}`, {
+      const paymentResponse = await fetch(`https://carrental-system-mg-production.up.railway.app/api/payments/advance/${bookingId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ const Payment: React.FC = () => {
       const payment = await paymentResponse.json();
 
       // Step 3: Confirm the booking
-      const confirmResponse = await fetch(`http://localhost:8080/api/bookings/${bookingId}/confirm`, {
+      const confirmResponse = await fetch(`https://carrental-system-mg-production.up.railway.app/api/bookings/${bookingId}/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

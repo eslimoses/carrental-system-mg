@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
 import { useAuth } from '../../hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,17 +35,9 @@ const Login: React.FC = () => {
       await login(email, password);
       setSuccess(true);
       
-      // Artificial delay for smooth transition
+      // Artificial delay for smooth transition before unmounting
       setTimeout(() => {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          const user = JSON.parse(userStr);
-          if (user.role === 'ADMIN') {
-            navigate('/admin');
-          } else {
-            navigate('/dashboard');
-          }
-        }
+        // No need to navigate here as useAuth.login already handles it
       }, 1500);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid email or password');
