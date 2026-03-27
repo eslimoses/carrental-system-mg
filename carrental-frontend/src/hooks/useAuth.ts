@@ -30,7 +30,11 @@ export const useAuth = () => {
       }
       
       const from = (window.history.state as any)?.usr?.from || (userData.role === 'CUSTOMER' ? '/dashboard' : '/admin');
-      navigate(from);
+      
+      // Force a full page reload to the dashboard/admin to ensure data is fresh
+      setTimeout(() => {
+        window.location.href = from;
+      }, 500); 
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Login failed');
     } finally {
