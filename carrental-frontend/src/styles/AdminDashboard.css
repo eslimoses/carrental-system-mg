@@ -1,0 +1,501 @@
+/* Admin Dashboard Enhanced Styles */
+
+/* Revenue Chart Styles */
+.revenue-chart-container {
+  height: 280px;
+  padding: 20px;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  padding: 0 10px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.chart-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 60px;
+}
+
+.chart-bar {
+  width: 40px;
+  background: linear-gradient(180deg, #d4a574 0%, #c49464 100%);
+  border-radius: 6px 6px 0 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.chart-bar:hover {
+  background: linear-gradient(180deg, #e5b685 0%, #d4a574 100%);
+  transform: scaleY(1.02);
+}
+
+.chart-bar-value {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.chart-bar-label {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #888;
+}
+
+/* Notifications Panel */
+.notifications-panel {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+  background: #f9f9f9;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon.booking {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.notification-icon.payment {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.notification-icon.alert {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.notification-icon.user {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.notification-content p {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* Vehicle Management */
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.vehicle-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.vehicle-image {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.vehicle-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vehicle-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.vehicle-status.available {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.vehicle-status.rented {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.vehicle-status.maintenance {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.vehicle-info {
+  padding: 20px;
+}
+
+.vehicle-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1f3a;
+  margin: 0 0 8px 0;
+}
+
+.vehicle-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.vehicle-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+}
+
+.vehicle-meta svg {
+  color: #d4a574;
+}
+
+.vehicle-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.vehicle-price .amount {
+  font-size: 22px;
+  font-weight: 700;
+  color: #d4a574;
+}
+
+.vehicle-price .period {
+  font-size: 13px;
+  color: #888;
+}
+
+.vehicle-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.vehicle-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vehicle-actions .edit-btn {
+  background: #f5f5f5;
+  border: none;
+  color: #333;
+}
+
+.vehicle-actions .edit-btn:hover {
+  background: #e0e0e0;
+}
+
+.vehicle-actions .delete-btn {
+  background: #ffebee;
+  border: none;
+  color: #d32f2f;
+}
+
+.vehicle-actions .delete-btn:hover {
+  background: #ffcdd2;
+}
+
+/* Booking Management */
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bookings-table th {
+  text-align: left;
+  padding: 16px;
+  background: #f9f9f9;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.bookings-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
+}
+
+.bookings-table tr:hover {
+  background: #f9f9f9;
+}
+
+.booking-customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.customer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #d4a574;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1f3a;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.booking-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.booking-status.confirmed {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.booking-status.pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.booking-status.cancelled {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.booking-status.completed {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+/* Reports Section */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.report-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.report-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-card h3 svg {
+  color: #d4a574;
+}
+
+.report-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.report-stat {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.report-stat-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.report-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1f3a;
+}
+
+/* Settings Section */
+.admin-settings {
+  max-width: 800px;
+}
+
+.settings-group {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.settings-group h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-info h4 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.setting-info p {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+  border-color: #d4a574;
+  background: rgba(212, 165, 116, 0.05);
+  transform: translateY(-2px);
+}
+
+.quick-action-btn svg {
+  width: 28px;
+  height: 28px;
+  color: #d4a574;
+}
+
+.quick-action-btn span {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .vehicles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}

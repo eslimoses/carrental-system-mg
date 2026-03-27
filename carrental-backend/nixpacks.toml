@@ -1,0 +1,5 @@
+[phases.build]
+cmds = ["./mvnw clean package -DskipTests"]
+
+[start]
+cmd = "java -jar target/carrental-system-0.0.1-SNAPSHOT.jar"

@@ -1,0 +1,363 @@
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FiFilter, FiSearch } from 'react-icons/fi';
+
+interface Car {
+  id: number;
+  name: string;
+  brand: string;
+  type: string;
+  transmission: string;
+  fuel: string;
+  seats: number;
+  price: number;
+  color: string;
+  image: string;
+}
+
+const CarListing: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = location.state || {};
+
+  const [vehicleType, setVehicleType] = useState(searchParams.category || 'All');
+  const [transmission, setTransmission] = useState('All');
+  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Car data with real brand images
+  const cars: Car[] = [
+    { id: 1, name: 'Toyota Camry', brand: 'Toyota', type: 'Sedan', transmission: 'Automatic', fuel: 'Petrol', seats: 5, price: 2500, color: 'White', image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/110233/camry-exterior-right-front-three-quarter-2.jpeg?isig=0&q=80' },
+    { id: 2, name: 'Honda City', brand: 'Honda', type: 'Sedan', transmission: 'Manual', fuel: 'Petrol', seats: 5, price: 2000, color: 'Silver', image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/134287/city-exterior-right-front-three-quarter-77.jpeg?isig=0&q=80' },
+    { id: 3, name: 'Hyundai Creta', brand: 'Hyundai', type: 'SUV', transmission: 'Automatic', fuel: 'Diesel', seats: 5, price: 3000, color: 'Red', image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/106815/creta-exterior-right-front-three-quarter-4.jpeg?isig=0&q=80' },
+    { id: 4, name: 'Maruti Swift', brand: 'Maruti', type: 'Hatchback', transmission: 'Manual', fuel: 'Petrol', seats: 5, price: 1500, color: 'Blue', image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/159099/swift-exterior-right-front-three-quarter.jpeg?isig=0&q=80' },
+    { id: 5, name: 'Mercedes E-Class', brand: 'Mercedes', type: 'Luxury', transmission: 'Automatic', fuel: 'Petrol', seats: 5, price: 8000, color: 'Black', image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/162929/e-class-exterior-right-front-three-quarter-33.jpeg?isig=0&q=80' },
+    { id: 6, name: 'Tesla Model 3', brand: 'Tesla', type: 'Electric', transmission: 'Automatic', fuel: 'Electric', seats: 5, price: 5000, color: 'White', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJcdk4fJGId8OzC5CPn44ukPkoiWJTMFnOEg&s' },
+    { id: 7, name: 'BMW 5 Series', brand: 'BMW', type: 'Luxury', transmission: 'Automatic', fuel: 'Petrol', seats: 5, price: 7500, color: 'Blue', image: 'https://images.hindustantimes.com/auto/img/2023/04/27/600x338/BMW_5_Series_exterior_1626237203821_1682576165957.jpg' },
+    { id: 8, name: 'Tata Nexon EV', brand: 'Tata', type: 'Electric', transmission: 'Automatic', fuel: 'Electric', seats: 5, price: 2800, color: 'Green', image: 'https://img.autocarindia.com/Reviews/20230912031038__Nexon%20EV%20Facelift%20Web%20Resized%20%20Watermarked%20._012.jpeg?w=700&c=0' },
+    { id: 9, name: 'Maruti Alto', brand: 'Maruti', type: 'Mini', transmission: 'Manual', fuel: 'Petrol', seats: 4, price: 1000, color: 'White', image: 'https://media.mahindrafirstchoice.com/live_web_images/usedcarsimg/mfc/4112/618457/cover_image-20241001123618.jpeg' },
+    { id: 10, name: 'Hyundai i20', brand: 'Hyundai', type: 'Hatchback', transmission: 'Automatic', fuel: 'Petrol', seats: 5, price: 1800, color: 'Red', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlOOottgvdKXKvKo5xGLo0lBcuZyKwZSoNDw&s' },
+    { id: 11, name: 'Toyota Fortuner', brand: 'Toyota', type: 'SUV', transmission: 'Automatic', fuel: 'Diesel', seats: 7, price: 5500, color: 'White', image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/44709/fortuner-exterior-right-front-three-quarter-19.jpeg?isig=0&q=80' },
+    { id: 12, name: 'Audi A6', brand: 'Audi', type: 'Luxury', transmission: 'Automatic', fuel: 'Petrol', seats: 5, price: 9000, color: 'Black', image: 'https://www.carblogindia.com/wp-content/uploads/2019/08/2019-Audi-A6.jpg' },
+  ];
+
+  const vehicleTypes = ['All', 'Sedan', 'SUV', 'Hatchback', 'Luxury', 'Electric', 'Mini'];
+  const transmissions = ['All', 'Automatic', 'Manual'];
+
+  // Filter cars
+  const filteredCars = cars.filter(car => {
+    const matchesType = vehicleType === 'All' || car.type === vehicleType;
+    const matchesTransmission = transmission === 'All' || car.transmission === transmission;
+    const matchesPrice = car.price >= priceRange[0] && car.price <= priceRange[1];
+    const matchesSearch = car.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          car.brand.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesType && matchesTransmission && matchesPrice && matchesSearch;
+  });
+
+  // Store car data in localStorage for CarDetail page
+  const handleBookNow = (car: Car) => {
+    localStorage.setItem('selectedCar', JSON.stringify(car));
+    navigate(`/cars/${car.id}`);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: '#0f1629', padding: '30px 20px' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1 style={{ color: '#d4a574', fontSize: '42px', fontWeight: 'bold', marginBottom: '10px' }}>
+            Our Fleet
+          </h1>
+          <p style={{ color: '#b0b8c8', fontSize: '18px' }}>
+            Choose from our wide selection of premium vehicles
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div style={{ 
+          maxWidth: '600px', 
+          margin: '0 auto 30px',
+          position: 'relative'
+        }}>
+          <FiSearch style={{ 
+            position: 'absolute', 
+            left: '20px', 
+            top: '50%', 
+            transform: 'translateY(-50%)',
+            color: '#666',
+            fontSize: '20px'
+          }} />
+          <input
+            type="text"
+            placeholder="Search by car name or brand..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '16px 20px 16px 55px',
+              borderRadius: '30px',
+              border: '2px solid #d4a574',
+              backgroundColor: '#1a1f3a',
+              color: '#ffffff',
+              fontSize: '16px',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
+
+        {/* Filters Section */}
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.05)', 
+          borderRadius: '16px', 
+          padding: '25px',
+          marginBottom: '30px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+            <FiFilter style={{ color: '#d4a574', fontSize: '24px' }} />
+            <h3 style={{ color: '#d4a574', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Filters</h3>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px' }}>
+            {/* Vehicle Type Filter */}
+            <div>
+              <label style={{ display: 'block', color: '#ffffff', marginBottom: '12px', fontWeight: '600', fontSize: '16px' }}>
+                Vehicle Type
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {vehicleTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setVehicleType(type)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '25px',
+                      border: 'none',
+                      backgroundColor: vehicleType === type ? '#d4a574' : 'rgba(255,255,255,0.1)',
+                      color: vehicleType === type ? '#1a1f3a' : '#ffffff',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Transmission Filter */}
+            <div>
+              <label style={{ display: 'block', color: '#ffffff', marginBottom: '12px', fontWeight: '600', fontSize: '16px' }}>
+                Transmission
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {transmissions.map(trans => (
+                  <button
+                    key={trans}
+                    onClick={() => setTransmission(trans)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '25px',
+                      border: 'none',
+                      backgroundColor: transmission === trans ? '#d4a574' : 'rgba(255,255,255,0.1)',
+                      color: transmission === trans ? '#1a1f3a' : '#ffffff',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {trans}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Range Filter */}
+            <div>
+              <label style={{ display: 'block', color: '#ffffff', marginBottom: '12px', fontWeight: '600', fontSize: '16px' }}>
+                Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}/day
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="10000"
+                step="500"
+                value={priceRange[1]}
+                onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                style={{
+                  width: '100%',
+                  height: '8px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  accentColor: '#d4a574'
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#b0b8c8', fontSize: '12px', marginTop: '5px' }}>
+                <span>₹0</span>
+                <span>₹10,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div style={{ marginBottom: '20px' }}>
+          <p style={{ color: '#b0b8c8', fontSize: '16px' }}>
+            Showing <span style={{ color: '#d4a574', fontWeight: 'bold' }}>{filteredCars.length}</span> vehicles
+          </p>
+        </div>
+
+        {/* Car Grid */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+          gap: '25px' 
+        }}>
+          {filteredCars.map(car => (
+            <div
+              key={car.id}
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.1)',
+                transition: 'transform 0.3s, box-shadow 0.3s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 15px 40px rgba(212, 165, 116, 0.2)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              {/* Car Image */}
+              <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
+                <img
+                  src={car.image}
+                  alt={car.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800';
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: '15px',
+                  left: '15px',
+                  backgroundColor: '#d4a574',
+                  color: '#1a1f3a',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  fontWeight: 'bold',
+                  fontSize: '12px'
+                }}>
+                  {car.type}
+                </div>
+                <div style={{
+                  position: 'absolute',
+                  top: '15px',
+                  right: '15px',
+                  backgroundColor: car.color.toLowerCase(),
+                  width: '25px',
+                  height: '25px',
+                  borderRadius: '50%',
+                  border: '3px solid white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+                }} title={car.color} />
+              </div>
+
+              {/* Car Details */}
+              <div style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                  <div>
+                    <h3 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 'bold', margin: '0 0 5px 0' }}>
+                      {car.name}
+                    </h3>
+                    <p style={{ color: '#b0b8c8', fontSize: '14px', margin: 0 }}>
+                      {car.brand} • {car.color}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Specs */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '15px', 
+                  marginBottom: '15px',
+                  flexWrap: 'wrap'
+                }}>
+                  <span style={{ 
+                    backgroundColor: 'rgba(255,255,255,0.1)', 
+                    padding: '6px 12px', 
+                    borderRadius: '15px',
+                    color: '#b0b8c8',
+                    fontSize: '12px'
+                  }}>
+                    {car.transmission}
+                  </span>
+                  <span style={{ 
+                    backgroundColor: 'rgba(255,255,255,0.1)', 
+                    padding: '6px 12px', 
+                    borderRadius: '15px',
+                    color: '#b0b8c8',
+                    fontSize: '12px'
+                  }}>
+                    {car.fuel}
+                  </span>
+                  <span style={{ 
+                    backgroundColor: 'rgba(255,255,255,0.1)', 
+                    padding: '6px 12px', 
+                    borderRadius: '15px',
+                    color: '#b0b8c8',
+                    fontSize: '12px'
+                  }}>
+                    {car.seats} Seats
+                  </span>
+                </div>
+
+                {/* Price and Book Button */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ color: '#d4a574', fontSize: '24px', fontWeight: 'bold' }}>
+                      ₹{car.price}
+                    </span>
+                    <span style={{ color: '#b0b8c8', fontSize: '14px' }}>/day</span>
+                  </div>
+                  <button
+                    onClick={() => handleBookNow(car)}
+                    style={{
+                      backgroundColor: '#d4a574',
+                      color: '#1a1f3a',
+                      border: 'none',
+                      padding: '12px 25px',
+                      borderRadius: '25px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      fontSize: '14px'
+                    }}
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* No Results */}
+        {filteredCars.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: '60px', marginBottom: '20px' }}>🚗</div>
+            <h3 style={{ color: '#ffffff', fontSize: '24px', marginBottom: '10px' }}>No cars found</h3>
+            <p style={{ color: '#b0b8c8' }}>Try adjusting your filters to see more results</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CarListing;
