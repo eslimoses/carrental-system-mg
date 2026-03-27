@@ -28,12 +28,11 @@ export const useAuth = () => {
         navigate('/cars', { state: { subscriptionPlan: pendingSubscription } });
         return;
       }
-      
       const role = userData.role?.toUpperCase();
-      const from = (window.history.state as any)?.usr?.from || (role === 'CUSTOMER' ? '/dashboard' : '/admin');
+      const from = (window.history.state as any)?.usr?.from || (role === 'ADMIN' || role === 'SUPER_ADMIN' ? '/admin' : '/dashboard');
       
-      // Force an immediate, reliable redirect
-      window.location.replace(from);
+      // Use client-side navigate to avoid 404 on Vercel without vercel.json
+      navigate(from);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Login failed');
     } finally {
