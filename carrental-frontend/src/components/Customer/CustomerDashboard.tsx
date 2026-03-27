@@ -84,15 +84,23 @@ const CustomerDashboard: React.FC = () => {
     removeFavorite.mutate(vehicleId);
   };
 
-  const isFavorite = (vehicleId: number) => {
-    return (userFavorites as any[]).some((v: any) => v.id === vehicleId);
+  const isFavorite = (vehicleId: any) => {
+    if (!vehicleId || !userFavorites) return false;
+    const vId = Number(vehicleId);
+    return (userFavorites as any[]).some((v: any) => Number(v.id) === vId);
   };
 
-  const toggleFavorite = (vehicleId: number) => {
-    if (isFavorite(vehicleId)) {
-        removeFavorite.mutate(vehicleId);
+  const toggleFavorite = (vehicleId: any) => {
+    if (!vehicleId) return;
+    const vId = Number(vehicleId);
+    if (isFavorite(vId)) {
+        removeFavorite.mutate(vId, {
+          onError: (err: any) => alert('Failed to remove from favorites: ' + (err.response?.data?.message || 'Unknown error'))
+        });
     } else {
-        addFavorite.mutate(vehicleId);
+        addFavorite.mutate(vId, {
+          onError: (err: any) => alert('Failed to add to favorites: ' + (err.response?.data?.message || 'Unknown error'))
+        });
     }
   };
 
@@ -206,11 +214,11 @@ const CustomerDashboard: React.FC = () => {
                           {b.cityName && <span className="flex items-center gap-1"><FiMapPin /> {b.cityName}</span>}
                           {b.vehicleId && (
                             <button 
-                                onClick={() => toggleFavorite(b.vehicleId)} 
-                                className={`flex items-center gap-1 transition-all ${isFavorite(b.vehicleId) ? 'text-red-500 font-bold' : 'text-gray-400 hover:text-red-400'}`}
+                                onClick={(e) => { e.stopPropagation(); toggleFavorite(b.vehicleId); }} 
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all duration-300 ${isFavorite(b.vehicleId) ? 'bg-red-500/10 text-red-500 font-black shadow-lg shadow-red-500/10 border border-red-500/20' : 'bg-white/5 text-gray-400 hover:text-red-400 border border-white/5'}`}
                             >
-                                <FiHeart fill={isFavorite(b.vehicleId) ? '#ef4444' : 'none'} />
-                                {isFavorite(b.vehicleId) ? 'Favorited' : 'Favorite'}
+                                <FiHeart size={14} fill={isFavorite(b.vehicleId) ? '#ef4444' : 'none'} className={isFavorite(b.vehicleId) ? 'animate-pulse' : ''} />
+                                <span className="text-[10px] uppercase tracking-widest">{isFavorite(b.vehicleId) ? 'Favorited' : 'Favorite'}</span>
                             </button>
                           )}
                         </div>

@@ -46,23 +46,28 @@ const CarListing: React.FC = () => {
   
   const { favorites, addFavorite, removeFavorite } = useFavorites(user?.id || null);
 
-  const toggleFavorite = async (e: React.MouseEvent, vehicleId: number) => {
+  const isVehicleFavorite = (vehicleId: any) => {
+    if (!vehicleId || !favorites) return false;
+    return favorites.some((v: any) => Number(v.id) === Number(vehicleId));
+  };
+
+  const toggleFavorite = async (e: React.MouseEvent, vehicleId: any) => {
     e.stopPropagation();
     if (!user) {
        navigate('/login');
        return;
     }
     
-    const isFavorite = favorites.some((v: any) => v.id === vehicleId);
-    if (isFavorite) {
-      removeFavorite.mutate(vehicleId);
+    const vId = Number(vehicleId);
+    if (isVehicleFavorite(vId)) {
+        removeFavorite.mutate(vId, {
+          onError: (err: any) => alert('Failed to remove from favorites: ' + (err.response?.data?.message || 'Unknown error'))
+        });
     } else {
-      addFavorite.mutate(vehicleId);
+        addFavorite.mutate(vId, {
+          onError: (err: any) => alert('Failed to add to favorites: ' + (err.response?.data?.message || 'Unknown error'))
+        });
     }
-  };
-
-  const isVehicleFavorite = (vehicleId: number) => {
-    return favorites.some((v: any) => v.id === vehicleId);
   };
 
   const transmissionsList = ['All', 'Automatic', 'Manual'];
@@ -330,26 +335,43 @@ const CarListing: React.FC = () => {
                   }}>
                     {vehicle.category?.name || 'Vehicle'}
                   </div>
-                  <button 
+                                    <button 
                     onClick={(e: React.MouseEvent) => toggleFavorite(e, vehicle.id)}
                     style={{
                       position: 'absolute',
                       top: '15px',
                       left: '15px',
-                      backgroundColor: 'rgba(255,255,255,0.2)',
-                      color: isVehicleFavorite(vehicle.id) ? '#ff4d4d' : '#ffffff',
-                      border: 'none',
-                      padding: '8px',
-                      borderRadius: '50%',
-                      cursor: 'pointer',
-                      backdropFilter: 'blur(5px)',
+                      padding: '12px',
+                      borderRadius: '16px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.3s ease'
+                      zIndex: 100,
+                      backgroundColor: isVehicleFavorite(vehicle.id) ? 'rgba(239, 68, 68, 0.15)' : 'rgba(0, 0, 0, 0.3)',
+                      backdropFilter: 'blur(8px)',
+                      border: isVehicleFavorite(vehicle.id) ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)',
+                      transition: 'all 0.3s ease',
+                      boxShadow: isVehicleFavorite(vehicle.id) ? '0 8px 20px rgba(239, 68, 68, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.2)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                      e.currentTarget.style.backgroundColor = isVehicleFavorite(vehicle.id) ? 'rgba(239, 68, 68, 0.25)' : 'rgba(0, 0, 0, 0.5)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.backgroundColor = isVehicleFavorite(vehicle.id) ? 'rgba(239, 68, 68, 0.15)' : 'rgba(0, 0, 0, 0.3)';
                     }}
                   >
-                    <FiHeart fill={isVehicleFavorite(vehicle.id) ? '#ff4d4d' : 'none'} size={20} />
+                    <FiHeart 
+                      size={20} 
+                      fill={isVehicleFavorite(vehicle.id) ? '#ef4444' : 'none'} 
+                      style={{ 
+                        color: isVehicleFavorite(vehicle.id) ? '#ef4444' : '#ffffff',
+                        transition: 'all 0.3s ease',
+                        filter: isVehicleFavorite(vehicle.id) ? 'drop-shadow(0 0 5px rgba(239, 68, 68, 0.5))' : 'none'
+                      }}
+                      className={isVehicleFavorite(vehicle.id) ? 'animate-pulse' : ''}
+                    />
                   </button>
                 </div>
 
