@@ -80,8 +80,13 @@ const CustomerDashboard: React.FC = () => {
     deleteBooking.mutate(bookingId);
   };
 
-  const handleRemoveFavorite = async (vehicleId: number) => {
-    removeFavorite.mutate(vehicleId);
+  const handleRemoveFavorite = (vehicleId: any) => {
+    if (!vehicleId) return;
+    const vId = Number(vehicleId);
+    removeFavorite.mutate(vId, {
+      onSuccess: () => alert('✅ Car removed from favorites.'),
+      onError: (err: any) => alert('❌ Failed: ' + (err.response?.data?.message || 'Unknown error'))
+    });
   };
 
   const isFavorite = (vehicleId: any) => {
@@ -357,7 +362,13 @@ const CustomerDashboard: React.FC = () => {
                     </div>
                     <div className="flex gap-3 mt-6">
                       <button onClick={() => navigate(`/booking/${v.id}`)} className="flex-1 bg-[#d4a574] text-[#1a1c2e] py-3 rounded-2xl font-black hover:bg-amber-500 transition shadow-lg shadow-amber-500/20 text-xs uppercase tracking-widest">Book Journey</button>
-                      <button onClick={() => handleRemoveFavorite(v.id)} className="p-3 border-2 border-red-500/10 rounded-2xl text-red-500 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500 transition" title="Remove from favorites"><FiHeart size={20} fill="#ef4444" /></button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleRemoveFavorite(v.id); }} 
+                        className="p-3 border-2 border-red-500/10 rounded-2xl text-red-500 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500 transition shadow-lg shadow-red-500/5 cursor-pointer relative z-50" 
+                        title="Remove from favorites"
+                      >
+                        <FiHeart size={20} fill="#ef4444" />
+                      </button>
                     </div>
                   </div>
                 </div>
