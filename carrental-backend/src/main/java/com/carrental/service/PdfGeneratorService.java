@@ -91,10 +91,10 @@ public class PdfGeneratorService {
                 ? "TOTAL REFUNDED AMOUNT: Rs. " : 
                 (payment != null ? "AMOUNT PAID (THIS INVOICE): Rs. " : "TOTAL AMOUNT PAID: Rs. ");
             
-            document.add(new Paragraph(amountLabel + String.format("%.2f", paidAmount), highlightFont));
+            document.add(new Paragraph(amountLabel + String.format("%.2f", paidAmount != null ? paidAmount : java.math.BigDecimal.ZERO), highlightFont));
             
-            if (payment != null && paidAmount.compareTo(booking.getTotalAmount()) < 0 && payment.getPaymentType() != com.carrental.entity.Payment.PaymentType.REFUND) {
-                document.add(new Paragraph("REMAINING BALANCE DUE: Rs. " + String.format("%.2f", booking.getTotalAmount().subtract(paidAmount)), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new Color(220, 38, 38))));
+            if (payment != null && paidAmount != null && paidAmount.compareTo(booking.getTotalAmount() != null ? booking.getTotalAmount() : java.math.BigDecimal.ZERO) < 0 && payment.getPaymentType() != com.carrental.entity.Payment.PaymentType.REFUND) {
+                document.add(new Paragraph("REMAINING BALANCE DUE: Rs. " + String.format("%.2f", (booking.getTotalAmount() != null ? booking.getTotalAmount() : java.math.BigDecimal.ZERO).subtract(paidAmount)), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new Color(220, 38, 38))));
             }
 
             document.add(new Paragraph("TOTAL BOOKING AMOUNT: Rs. " + (booking.getTotalAmount() != null ? booking.getTotalAmount() : "0.00"), normalFont));

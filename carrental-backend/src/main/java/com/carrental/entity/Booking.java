@@ -83,6 +83,7 @@ public class Booking {
     private LocalDateTime rentalPaidDate;
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private List<RentalPhoto> rentalPhotos;
 
     @Column(name = "created_at", nullable = false, updatable = false)

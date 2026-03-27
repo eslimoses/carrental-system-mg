@@ -59,7 +59,7 @@ public class BookingService {
         City city = vehicle.getCity();
 
         if (vehicle.getStatus() != VehicleStatus.AVAILABLE) {
-            throw new RuntimeException("Vehicle is not available");
+            throw new RuntimeException("This car is currently already " + vehicle.getStatus() + ". Please choose another vehicle.");
         }
 
         // Check for conflicting bookings
@@ -115,7 +115,7 @@ public class BookingService {
         // Calculate delivery fee based on distance
         BigDecimal deliveryFee = calculateDeliveryFee(bookingDTO, city);
         booking.setDeliveryFee(deliveryFee);
-        booking.setDeliveryDistanceKm(bookingDTO.getDeliveryDistance());
+        booking.setDeliveryDistanceKm(bookingDTO.getDeliveryDistance() != null ? bookingDTO.getDeliveryDistance() : BigDecimal.ZERO);
         
         // Set extra options
         booking.setIncludeInsurance(bookingDTO.getIncludeInsurance());
@@ -167,8 +167,13 @@ public class BookingService {
         try {
             notificationService.sendBookingConfirmation(saved);
         } catch (Throwable e) {
-            System.err.println("Critical error sending booking confirmation notification: " + e.getMessage());
-            // Do not throw, allow booking success
+            System.err.println("Fatal error generating or sending HTML confirmation: " + e.getMessage());
+            e.printStackTrace();
+            // Safe fallback: plain text
+            notificationService.sendEmail(customer.getEmail(), "Booking Confirmation - " + saved.getBookingNumber(),
+                "Dear " + customer.getFirstName() + ",\n\nYour booking " + saved.getBookingNumber() + " is confirmed.\n"
+                + "Period: " + (saved.getPickupDate() != null ? saved.getPickupDate() : "") + " to " + (saved.getReturnDate() != null ? saved.getReturnDate() : "") + "\n"
+                + "Total: Rs. " + (saved.getTotalAmount() != null ? saved.getTotalAmount() : "0.00") + "\n\nThank you for choosing MotoGlide!");
         }
 
         return saved;

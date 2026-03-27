@@ -97,6 +97,10 @@ const CustomerDashboard: React.FC = () => {
 
   const toggleFavorite = (vehicleId: any) => {
     if (!vehicleId) return;
+    
+    // Safety check against rapid clicking or uninitialized data
+    if (favoritesLoading) return;
+    
     const vId = Number(vehicleId);
     if (isFavorite(vId)) {
         removeFavorite.mutate(vId, {
@@ -104,7 +108,13 @@ const CustomerDashboard: React.FC = () => {
         });
     } else {
         addFavorite.mutate(vId, {
-          onError: (err: any) => alert('Failed to add to favorites: ' + (err.response?.data?.message || 'Unknown error'))
+          onError: (err: any) => {
+             if (err.response?.data?.message === 'Vehicle already in favorites') {
+                // Ignore silent failure
+             } else {
+                alert('Failed to add to favorites: ' + (err.response?.data?.message || 'Unknown error'));
+             }
+          }
         });
     }
   };

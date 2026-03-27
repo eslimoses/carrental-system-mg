@@ -44,7 +44,7 @@ const CarListing: React.FC = () => {
     maxPrice: priceRange[1]
   });
   
-  const { favorites, addFavorite, removeFavorite } = useFavorites(user?.id || null);
+  const { favorites, isLoading: favoritesLoading, addFavorite, removeFavorite } = useFavorites(user?.id || null);
 
   const isVehicleFavorite = (vehicleId: any) => {
     if (!vehicleId || !favorites) return false;
@@ -58,6 +58,9 @@ const CarListing: React.FC = () => {
        return;
     }
     
+    // Prevent double submissions or fake inserts while still syncing from backend
+    if (favoritesLoading) return;
+    
     const vId = Number(vehicleId);
     if (isVehicleFavorite(vId)) {
         removeFavorite.mutate(vId, {
@@ -65,7 +68,13 @@ const CarListing: React.FC = () => {
         });
     } else {
         addFavorite.mutate(vId, {
-          onError: (err: any) => alert('Failed to add to favorites: ' + (err.response?.data?.message || 'Unknown error'))
+          onError: (err: any) => {
+             if (err.response?.data?.message === 'Vehicle already in favorites') {
+                 // It's a race condition where the UI didn't know it was already favorited. Ignore the error.
+             } else {
+                 alert('Failed to add to favorites: ' + (err.response?.data?.message || 'Unknown error'));
+             }
+          }
         });
     }
   };
@@ -116,7 +125,7 @@ const CarListing: React.FC = () => {
     return `${vehicle.make} ${vehicle.model}`;
   };
 
-  const vehicleTypeOptions = ['All', ...new Set(categories.map((c: any) => c.name))];
+  const vehicleTypeOptions: string[] = ['All', ...(Array.from(new Set(categories.map((c: any) => String(c.name)))) as string[])];
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0f1629', padding: '30px 20px' }}>

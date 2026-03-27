@@ -80,7 +80,7 @@ public class NotificationService {
             + "<tr><td style='padding:14px 20px;color:#64748b;'>Car</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + vehicle.getMake() + " " + vehicle.getModel() + " (" + vehicle.getYear() + ")</td></tr>"
             + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Period</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + booking.getPickupDate() + " to " + booking.getReturnDate() + " (" + days + " day" + (days > 1 ? "s" : "") + ")</td></tr>"
             + "<tr><td style='padding:14px 20px;color:#64748b;'>Pickup Time</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + booking.getPickupTime() + "</td></tr>"
-            + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>City</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + booking.getCity().getName() + "</td></tr>"
+            + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>City</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + (booking.getCity() != null ? booking.getCity().getName() : "N/A") + "</td></tr>"
             + "<tr><td style='padding:14px 20px;color:#64748b;'>Status</td><td style='padding:14px 20px;font-weight:900;color:#10b981;text-transform:uppercase;'>CONFIRMED ✓</td></tr>"
             + "</table></div>"
             // Payment Summary Section (Green Theme)
@@ -264,7 +264,7 @@ public class NotificationService {
         sendPaymentConfirmationWhatsApp(booking, payment, bill);
     }
 
-    private void sendEmail(String to, String subject, String body) {
+    public void sendEmail(String to, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -307,8 +307,8 @@ public class NotificationService {
             + "<table style='width:100%;border-collapse:collapse;font-size:14px;'>"
             + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;width:40%;'>Booking ID</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>#" + booking.getBookingNumber() + "</td></tr>"
             + "<tr><td style='padding:14px 20px;color:#64748b;'>Car</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + vehicle.getMake() + " " + vehicle.getModel() + " (" + vehicle.getYear() + ")</td></tr>"
-            + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Period</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + booking.getPickupDate() + " to " + booking.getReturnDate() + "</td></tr>"
-            + "<tr><td style='padding:14px 20px;color:#64748b;'>City</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + booking.getCity().getName() + "</td></tr>"
+            + "<tr><td style='padding:14px 20px;color:#64748b;'>Period</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + booking.getPickupDate() + " to " + booking.getReturnDate() + "</td></tr>"
+            + "<tr><td style='padding:14px 20px;color:#64748b;'>City</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + (booking.getCity() != null ? booking.getCity().getName() : "N/A") + "</td></tr>"
             + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Status</td><td style='padding:14px 20px;font-weight:900;color:#e11d48;text-transform:uppercase;'>CANCELLED ✘</td></tr>"
             + "</table></div>"
             // Refund Summary Section (Green Theme)

@@ -18,6 +18,7 @@ public class RentalPhoto {
 
     @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private Booking booking;
 
     private String photoUrl;

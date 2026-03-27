@@ -104,14 +104,14 @@ const SuperAdminDashboard: React.FC = () => {
             <button 
               key={t.key} 
               onClick={() => setActiveTab(t.key)} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === t.key ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-[0_0_20px_rgba(37,99,235,0.1)]' : 'text-gray-500 hover:bg-gray-800/50 hover:text-gray-300'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${activeTab === t.key ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-[0_0_20px_rgba(37,99,235,0.1)]' : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'}`}
             >
               <t.icon className={`${activeTab === t.key ? 'text-blue-500' : ''}`} /> {t.label}
             </button>
           ))}
         </nav>
         
-        <div className="mt-auto pt-8 border-t border-[#1e2336]">
+        <div className="mt-auto pt-8 border-t border-[#1e2336] overflow-y-auto max-h-[calc(100vh-400px)]">
           <button 
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-500/10 transition-all duration-300"
