@@ -41,8 +41,8 @@ public class JwtService {
             // First try strict Base64 decode (Standard)
             byte[] keyBytes = Decoders.BASE64.decode(secret);
             return Keys.hmacShaKeyFor(keyBytes);
-        } catch (IllegalArgumentException e) {
-            // Fallback if the user set a custom secret (like a UUID) that contains '-' or other non-base64 characters
+        } catch (Exception e) {
+            // Fallback for custom secrets (UUIDs, plain text) that fail Base64 decoding
             byte[] keyBytes = secret.getBytes(java.nio.charset.StandardCharsets.UTF_8);
             
             // HS256 requires a key of at least 256 bits (32 bytes). 
