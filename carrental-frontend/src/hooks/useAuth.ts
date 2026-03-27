@@ -29,12 +29,11 @@ export const useAuth = () => {
         return;
       }
       
-      const from = (window.history.state as any)?.usr?.from || (userData.role === 'CUSTOMER' ? '/dashboard' : '/admin');
+      const role = userData.role?.toUpperCase();
+      const from = (window.history.state as any)?.usr?.from || (role === 'CUSTOMER' ? '/dashboard' : '/admin');
       
-      // Force a full page reload to the dashboard/admin to ensure data is fresh
-      setTimeout(() => {
-        window.location.href = from;
-      }, 500); 
+      // Force an immediate, reliable redirect
+      window.location.replace(from);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Login failed');
     } finally {
