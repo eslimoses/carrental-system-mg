@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiUsers, FiTruck, FiCalendar, FiMapPin, FiPlus, FiEdit, FiTrash2, FiX, FiBarChart, FiDollarSign, FiTag, FiActivity, FiLogOut, FiFileText, FiEye, FiMail, FiDownload, FiAlertCircle, FiBell, FiSend } from 'react-icons/fi';
+import { FiUsers, FiTruck, FiCalendar, FiMapPin, FiPlus, FiEdit, FiTrash2, FiX, FiBarChart, FiDollarSign, FiTag, FiActivity, FiLogOut, FiFileText, FiEye, FiMail, FiDownload, FiAlertCircle, FiBell } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useAdminStats, useAdminVehicles, useAdminBookings, useAdminUsers, useAdminActions, useVehicleManagement, useCityManagement, useCities, useCategories, useAdminOffers, useOfferManagement, useCustomerActivities, useCategoryManagement, useAuth, useAdminPayments } from '../../hooks';
 
