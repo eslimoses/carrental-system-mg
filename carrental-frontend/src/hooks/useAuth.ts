@@ -35,6 +35,7 @@ export const useAuth = () => {
       navigate(from);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Login failed');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -54,6 +55,7 @@ export const useAuth = () => {
       navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -67,6 +69,7 @@ export const useAuth = () => {
       navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
+      throw err;
     } finally {
       setLoading(false);
     }

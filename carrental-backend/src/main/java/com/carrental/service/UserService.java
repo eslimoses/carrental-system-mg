@@ -58,7 +58,24 @@ public class UserService {
             throw new RuntimeException("User account is not active");
         }
         
-        if (!passwordEncoder.matches(password, user.getPassword()) && !password.equals(user.getPassword())) {
+        boolean passwordMatches = false;
+        
+        // 1. Check if the password matches as plain text (legacy users)
+        if (password.equals(user.getPassword())) {
+            passwordMatches = true;
+        } else {
+            // 2. Try BCrypt Check
+            try {
+                if (passwordEncoder.matches(password, user.getPassword())) {
+                    passwordMatches = true;
+                }
+            } catch (IllegalArgumentException e) {
+                // Not a valid BCrypt hash, and didn't match plain text above
+                passwordMatches = false;
+            }
+        }
+
+        if (!passwordMatches) {
             throw new RuntimeException("Invalid credentials");
         }
         
