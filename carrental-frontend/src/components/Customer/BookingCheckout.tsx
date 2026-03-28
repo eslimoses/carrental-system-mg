@@ -116,8 +116,10 @@ const BookingCheckout: React.FC = () => {
       },
       onError: (err: any) => {
         const data = err.response?.data;
-        const errorMsg = typeof data === 'string' ? data : data?.message || 'Failed to create booking';
+        const errorMsg = typeof data === 'string' ? data : data?.message || err.message || 'Failed to create booking';
         setError(errorMsg);
+        // Log detailed error for developers
+        console.error('Booking creation error:', err);
       }
     });
   };

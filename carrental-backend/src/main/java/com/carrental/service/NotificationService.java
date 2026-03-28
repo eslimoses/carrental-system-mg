@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.core.io.ByteArrayResource;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
@@ -47,6 +48,7 @@ public class NotificationService {
         }
     }
 
+    @Async
     public void sendBookingConfirmation(Booking booking) {
         User customer = booking.getCustomer();
         com.carrental.entity.Vehicle vehicle = booking.getVehicle();
@@ -169,6 +171,7 @@ public class NotificationService {
         sendEmail(customer.getEmail(), subject, body);
     }
 
+    @Async
     public void sendPaymentConfirmationWithInvoice(com.carrental.entity.Booking booking, 
                                                      com.carrental.entity.Payment payment,
                                                      Bill bill) {

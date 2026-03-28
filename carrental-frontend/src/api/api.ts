@@ -4,6 +4,7 @@ const API_BASE_URL = 'https://carrental-system-mg-production.up.railway.app/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 20000, // 20s timeout to prevent infinite hangs
   headers: {
     'Content-Type': 'application/json',
   },

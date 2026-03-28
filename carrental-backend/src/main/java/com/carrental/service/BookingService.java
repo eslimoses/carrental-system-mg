@@ -51,12 +51,16 @@ public class BookingService {
     private static final BigDecimal ADDITIONAL_DRIVER_PER_DAY = new BigDecimal("100.00");
 
     public Booking createBooking(BookingDTO bookingDTO) {
+        System.out.println("[DEBUG] Start createBooking for vehicleId: " + bookingDTO.getVehicleId());
+        
         // Get entities
         User customer = userRepository.findById(bookingDTO.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         Vehicle vehicle = vehicleRepository.findById(bookingDTO.getVehicleId())
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
         City city = vehicle.getCity();
+
+        System.out.println("[DEBUG] Entities loaded: Customer=" + customer.getEmail() + ", Vehicle=" + vehicle.getModel());
 
         if (vehicle.getStatus() != VehicleStatus.AVAILABLE) {
             throw new RuntimeException("This car is currently already " + vehicle.getStatus() + ". Please choose another vehicle.");
@@ -69,11 +73,14 @@ public class BookingService {
                 bookingDTO.getReturnDate()
         );
 
+        System.out.println("[DEBUG] Dates validated. No conflicts found.");
+
         if (!conflicts.isEmpty()) {
             throw new RuntimeException("Vehicle is already booked for the selected dates");
         }
 
         Booking booking = new Booking();
+        System.out.println("[DEBUG] Booking object created.");
         booking.setBookingNumber("BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         booking.setCustomer(customer);
         booking.setVehicle(vehicle);
@@ -160,14 +167,19 @@ public class BookingService {
         BigDecimal totalAfterCoupon = totalBeforeCoupon.subtract(couponDiscount).max(BigDecimal.ZERO);
         booking.setTotalAmount(totalAfterCoupon);
 
+        System.out.println("[DEBUG] Cost calculated: " + booking.getTotalAmount());
+        
+        System.out.println("[DEBUG] Attempting to save booking to DB...");
         Booking saved = bookingRepository.save(booking);
+        System.out.println("[DEBUG] Booking saved successfully with ID: " + saved.getId());
         
         // Send booking confirmation email
         // Send booking confirmation notifications (safe error handling)
+        System.out.println("[DEBUG] Triggering async notification for booking: " + saved.getBookingNumber());
         try {
             notificationService.sendBookingConfirmation(saved);
         } catch (Throwable e) {
-            System.err.println("Fatal error generating or sending HTML confirmation: " + e.getMessage());
+            System.err.println("[DEBUG] Async notification trigger failed: " + e.getMessage());
             e.printStackTrace();
             // Safe fallback: plain text
             notificationService.sendEmail(customer.getEmail(), "Booking Confirmation - " + saved.getBookingNumber(),
@@ -176,6 +188,7 @@ public class BookingService {
                 + "Total: Rs. " + (saved.getTotalAmount() != null ? saved.getTotalAmount() : "0.00") + "\n\nThank you for choosing MotoGlide!");
         }
 
+        System.out.println("[DEBUG] Returning saved booking to controller.");
         return saved;
     }
 
