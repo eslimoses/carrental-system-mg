@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.carrental.service.NotificationService;
 import com.carrental.service.PdfGeneratorService;
+import com.carrental.service.VehicleService;
+import com.carrental.dto.VehicleDTO;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ public class AdminController {
     private final BillRepository billRepository;
     private final PdfGeneratorService pdfGeneratorService;
     private final NotificationService notificationService;
+    private final VehicleService vehicleService;
 
     // Dashboard Statistics
     @GetMapping("/dashboard")
@@ -217,6 +220,11 @@ public class AdminController {
                         Vehicle vehicle = booking.getVehicle();
                         vehicle.setStatus(Vehicle.VehicleStatus.AVAILABLE);
                         vehicleRepository.save(vehicle);
+                        
+                        // NEW Fix: Correctly trigger the cancellation response
+                        if (newStatus == Booking.BookingStatus.CANCELLED) {
+                            notificationService.sendBookingCancellation(id);
+                        }
                     } else if (newStatus == Booking.BookingStatus.ACTIVE) {
                         Vehicle vehicle = booking.getVehicle();
                         vehicle.setStatus(Vehicle.VehicleStatus.RENTED);
@@ -242,6 +250,15 @@ public class AdminController {
                     return ResponseEntity.ok(vehicleRepository.save(vehicle));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/vehicles/{id}")
+    public ResponseEntity<?> updateVehicle(@PathVariable Long id, @RequestBody VehicleDTO vehicleDTO) {
+        try {
+            return ResponseEntity.ok(vehicleService.updateVehicle(id, vehicleDTO));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // Payment Management

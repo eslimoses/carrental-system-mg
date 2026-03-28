@@ -1250,7 +1250,8 @@ const SuperAdminDashboard: React.FC = () => {
                                 maintenanceWorkRequired: desc,
                                 maintenanceSchedule: (document.getElementById('m-routine') as HTMLTextAreaElement).value
                             })
-                        }).then(() => {
+                        }).then(res => {
+                           if (!res.ok) throw new Error('Vehicle compliance update failed');
                            // 2. Schedule Maintenance Record
                            return fetch(`${import.meta.env.VITE_API_URL}/admin/maintenance`, {
                               method: 'POST',
@@ -1263,10 +1264,13 @@ const SuperAdminDashboard: React.FC = () => {
                                  status: 'SCHEDULED'
                               })
                            });
-                        }).then(() => {
+                        }).then(res => {
+                           if (res && !res.ok) throw new Error('Maintenance scheduling failed');
                            alert('Maintenance scheduled and vehicle compliance updated!');
                            setShowMaintenanceModal(false);
                            window.location.reload();
+                        }).catch(err => {
+                           alert('Error: ' + err.message);
                         });
                      }}
                      className="mt-4 w-full bg-amber-500 text-[#111420] py-4 rounded-xl font-black uppercase tracking-widest hover:bg-amber-400 transition shadow-xl"

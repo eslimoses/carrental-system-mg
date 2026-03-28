@@ -253,10 +253,10 @@ public class NotificationService {
                 + "<div style='margin:0 30px;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 6px rgba(0,0,0,0.02);'>"
                 + "<div style='background:#f8fafc;padding:14px 20px;border-bottom:1px solid #e2e8f0;'><p style='color:#64748b;margin:0;font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;'>💳 TRANSACTION INFO</p></div>"
                 + "<table style='width:100%;border-collapse:collapse;font-size:14px;'>"
-                + "<tr><td style='padding:14px 20px;color:#64748b;'>Transaction ID</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + payment.getTransactionId() + "</td></tr>"
-                + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Amount Paid</td><td style='padding:14px 20px;font-weight:900;color:#10b981;'>Rs." + String.format("%.2f", payment.getAmount()) + "</td></tr>"
-                + "<tr><td style='padding:14px 20px;color:#64748b;'>Method</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + payment.getPaymentMethod() + "</td></tr>"
-                + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Date</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + payment.getPaymentDate() + "</td></tr>"
+                + "<tr><td style='padding:14px 20px;color:#64748b;'>Transaction ID</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + (payment != null ? payment.getTransactionId() : "CASH-PAYMENT") + "</td></tr>"
+                + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Amount Paid</td><td style='padding:14px 20px;font-weight:900;color:#10b981;'>Rs." + (payment != null ? String.format("%.2f", payment.getAmount()) : String.format("%.2f", booking.getAdvanceAmount())) + "</td></tr>"
+                + "<tr><td style='padding:14px 20px;color:#64748b;'>Method</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + (payment != null ? payment.getPaymentMethod() : "CASH") + "</td></tr>"
+                + "<tr style='background:#fcfdff;'><td style='padding:14px 20px;color:#64748b;'>Date</td><td style='padding:14px 20px;font-weight:800;color:#1e293b;'>" + (payment != null ? payment.getPaymentDate() : java.time.LocalDateTime.now()) + "</td></tr>"
                 + "</table></div>"
                 // Booking Summary
                 + "<div style='margin:25px 30px;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 6px rgba(0,0,0,0.02);'>"
@@ -655,7 +655,9 @@ public class NotificationService {
             helper.addAttachment("MotoGlide_Financial_Report_" + java.time.LocalDate.now() + ".pdf", new ByteArrayResource(pdfData));
             
             mailSender.send(message);
+            System.out.println("✅ [DEBUG] Reports: Financial report sent successfully.");
         } catch (Exception e) {
+            System.err.println("❌ [DEBUG] Reports Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
