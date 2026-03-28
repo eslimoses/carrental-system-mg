@@ -1,7 +1,6 @@
 package com.carrental.controller;
 
 import com.carrental.dto.BookingDTO;
-import com.carrental.entity.Booking;
 import com.carrental.repository.BookingRepository;
 import com.carrental.service.BookingService;
 import lombok.RequiredArgsConstructor;

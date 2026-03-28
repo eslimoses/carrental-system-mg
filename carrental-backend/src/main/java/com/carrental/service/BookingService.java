@@ -29,7 +29,6 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
-    private final CityRepository cityRepository;
     private final PaymentRepository paymentRepository;
     private final NotificationService notificationService;
     private final PromoCodeRepository promoCodeRepository;
@@ -298,7 +297,7 @@ public class BookingService {
         
         // Send completion email
         try {
-            notificationService.sendBookingCompletion(booking);
+            notificationService.sendBookingCompletion(booking.getId());
         } catch (Exception e) {
             System.err.println("Error sending completion email: " + e.getMessage());
         }
@@ -306,45 +305,61 @@ public class BookingService {
 
     @Transactional
     public void cancelBooking(Long bookingId) {
+        System.out.println("[DEBUG] Attempting to cancel booking ID: " + bookingId);
         Booking booking = getBookingById(bookingId);
-        booking.setStatus(BookingStatus.CANCELLED);
         
-        // Restore vehicle availability
+        if (booking.getStatus() == Booking.BookingStatus.CANCELLED) {
+            System.out.println("[DEBUG] Booking is already cancelled.");
+            return;
+        }
+
+        // 1. Restore vehicle availability
         Vehicle vehicle = booking.getVehicle();
         if (vehicle != null) {
+            System.out.println("[DEBUG] Restoring vehicle status to AVAILABLE for vehicle: " + vehicle.getMake() + " " + vehicle.getModel());
             vehicle.setStatus(VehicleStatus.AVAILABLE);
             vehicleRepository.save(vehicle);
+        } else {
+            System.out.println("[DEBUG] No vehicle associated with this booking.");
         }
-        
-        // Handle refund logic: If advance was received
-        if (Boolean.TRUE.equals(booking.getAdvancePaid()) && booking.getAdvanceAmount() != null) {
-            booking.setAmountReturned(booking.getAdvanceAmount());
-        }
-        
-        bookingRepository.save(booking);
-        
-        // Auto-refund any successful payments
-        List<Payment> successfulPayments = paymentRepository.findByBooking(booking).stream()
-                .filter(p -> p.getStatus() == Payment.PaymentStatus.SUCCESS)
-                .collect(Collectors.toList());
 
-        for (Payment p : successfulPayments) {
-            Payment refund = new Payment();
-            refund.setBooking(booking);
-            refund.setAmount(p.getAmount() != null ? p.getAmount() : BigDecimal.ZERO);
-            refund.setPaymentType(Payment.PaymentType.REFUND);
-            refund.setPaymentMethod(p.getPaymentMethod());
-            refund.setTransactionId("RFD-" + java.util.UUID.randomUUID().toString().substring(0, 12).toUpperCase());
-            refund.setStatus(Payment.PaymentStatus.SUCCESS);
-            refund.setPaymentDate(LocalDateTime.now());
-            paymentRepository.save(refund);
-        }
+        // 2. Update booking status
+        System.out.println("[DEBUG] Updating booking status to CANCELLED");
+        booking.setStatus(Booking.BookingStatus.CANCELLED);
+        booking.setUpdatedAt(LocalDateTime.now());
         
-        // Send cancellation email
+        // 3. Handle Refund logic if payment was made
+        // If advance amount was paid, we create a refund record
+        BigDecimal advancePaid = booking.getAdvanceAmount();
+        if (Boolean.TRUE.equals(booking.getAdvancePaid()) && advancePaid != null && advancePaid.compareTo(BigDecimal.ZERO) > 0) {
+            System.out.println("[DEBUG] Processing refund for advance payment: " + advancePaid);
+            try {
+                Payment refund = new Payment();
+                refund.setBooking(booking);
+                refund.setAmount(advancePaid);
+                refund.setPaymentType(Payment.PaymentType.REFUND);
+                refund.setPaymentMethod(Payment.PaymentMethod.CASH); // Default refund method
+                refund.setStatus(Payment.PaymentStatus.SUCCESS);
+                refund.setPaymentDate(LocalDateTime.now());
+                refund.setTransactionId("RFD-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+                paymentRepository.save(refund);
+                
+                booking.setAmountReturned(advancePaid);
+                System.out.println("[DEBUG] Refund created with ID: " + refund.getTransactionId());
+            } catch (Exception e) {
+                System.err.println("[ERROR] Failed to create refund record: " + e.getMessage());
+            }
+        }
+
+        bookingRepository.save(booking);
+        System.out.println("[DEBUG] Booking saved successfully.");
+        
+        // 4. Send cancellation notification (Async)
         try {
+            System.out.println("[DEBUG] Triggering async cancellation notification");
             notificationService.sendBookingCancellation(booking.getId());
         } catch (Exception e) {
-            System.err.println("Error sending cancellation email: " + e.getMessage());
+            System.err.println("[ERROR] Error triggering cancellation email: " + e.getMessage());
         }
     }
 

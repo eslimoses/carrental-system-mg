@@ -108,7 +108,7 @@ public class BillService {
         billRepository.save(bill);
         
         // Send email notifications
-        notificationService.sendBillEmail(bill);
+        notificationService.sendBillEmail(bill.getId());
     }
 
     private BillDTO convertToDTO(Bill bill) {

@@ -7,7 +7,6 @@ import com.carrental.entity.Booking.BookingStatus;
 import com.carrental.entity.Payment;
 import com.carrental.entity.Payment.PaymentStatus;
 import com.carrental.entity.Payment.PaymentType;
-import com.carrental.entity.Vehicle;
 import com.carrental.repository.BookingRepository;
 import com.carrental.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
