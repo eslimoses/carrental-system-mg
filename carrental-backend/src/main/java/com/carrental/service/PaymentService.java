@@ -126,7 +126,11 @@ public class PaymentService {
 
         // 4. Send confirmation email with invoice via Gmail SMTP
         try {
-            notificationService.sendPaymentConfirmationWithInvoice(booking, savedPayment, bill);
+            notificationService.sendPaymentConfirmationWithInvoice(
+                booking.getId(), 
+                savedPayment.getId(), 
+                bill != null ? bill.getId() : null
+            );
         } catch (Exception e) {
             System.err.println("Error sending payment confirmation email: " + e.getMessage());
         }
@@ -182,7 +186,11 @@ public class PaymentService {
 
         // 4. Send email confirmation with invoice PDF
         try {
-            notificationService.sendPaymentConfirmationWithInvoice(booking, savedPayment, bill);
+            notificationService.sendPaymentConfirmationWithInvoice(
+                booking.getId(), 
+                savedPayment.getId(), 
+                bill != null ? bill.getId() : null
+            );
         } catch (Exception e) {
             System.err.println("Error sending payment confirmation email: " + e.getMessage());
         }

@@ -4,6 +4,9 @@ import com.carrental.entity.Bill;
 import com.carrental.entity.Booking;
 import com.carrental.entity.User;
 import com.carrental.repository.UserRepository;
+import com.carrental.repository.BookingRepository;
+import com.carrental.repository.PaymentRepository;
+import com.carrental.repository.BillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -23,6 +26,9 @@ import jakarta.annotation.PostConstruct;
 public class NotificationService {
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final PaymentRepository paymentRepository;
+    private final BillRepository billRepository;
     private final PdfGeneratorService pdfGeneratorService;
 
     @Value("${spring.mail.username}")
@@ -49,7 +55,9 @@ public class NotificationService {
     }
 
     @Async
-    public void sendBookingConfirmation(Booking booking) {
+    public void sendBookingConfirmation(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) return;
         User customer = booking.getCustomer();
         com.carrental.entity.Vehicle vehicle = booking.getVehicle();
 
@@ -131,7 +139,7 @@ public class NotificationService {
                 + "Period: " + booking.getPickupDate() + " to " + booking.getReturnDate() + "\n"
                 + "Total: Rs. " + booking.getTotalAmount() + "\n\nThank you for choosing MotoGlide!");
         }
-        sendBookingConfirmationWhatsApp(booking);
+        sendBookingConfirmationWhatsApp(bookingId);
     }
 
     public void sendPaymentReminder(Booking booking) {
@@ -172,9 +180,13 @@ public class NotificationService {
     }
 
     @Async
-    public void sendPaymentConfirmationWithInvoice(com.carrental.entity.Booking booking, 
-                                                     com.carrental.entity.Payment payment,
-                                                     Bill bill) {
+    public void sendPaymentConfirmationWithInvoice(Long bookingId, Long paymentId, Long billId) {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        com.carrental.entity.Payment payment = paymentId != null ? paymentRepository.findById(paymentId).orElse(null) : null;
+        com.carrental.entity.Bill bill = billId != null ? billRepository.findById(billId).orElse(null) : null;
+        
+        if (booking == null || payment == null) return;
+        
         User customer = booking.getCustomer();
         com.carrental.entity.Vehicle vehicle = booking.getVehicle();
         
@@ -261,10 +273,8 @@ public class NotificationService {
             mailSender.send(message);
         } catch (Throwable e) {
             System.err.println("Error sending email with PDF invoice: " + e.getMessage());
-            // Fallback to simple email
-            sendEmail(customer.getEmail(), subject, sb.toString());
         }
-        sendPaymentConfirmationWhatsApp(booking, payment, bill);
+        sendPaymentConfirmationWhatsApp(bookingId, paymentId, billId);
     }
 
     public void sendEmail(String to, String subject, String body) {
@@ -280,7 +290,10 @@ public class NotificationService {
         }
     }
 
-    public void sendBookingCancellation(Booking booking) {
+    @Async
+    public void sendBookingCancellation(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) return;
         User customer = booking.getCustomer();
         com.carrental.entity.Vehicle vehicle = booking.getVehicle();
 
@@ -344,7 +357,7 @@ public class NotificationService {
                 "Dear " + customer.getFirstName() + ",\n\nYour booking " + booking.getBookingNumber() + " has been cancelled successfully.\n"
                 + "Any advance payment of Rs." + advancePaid + " has been initiated for refund.\n\nThank you for choosing MotoGlide!");
         }
-        sendBookingCancellationWhatsApp(booking);
+        sendBookingCancellationWhatsApp(bookingId);
     }
 
     public void sendBookingCompletion(Booking booking) {
@@ -359,13 +372,20 @@ public class NotificationService {
         sendEmail(customer.getEmail(), subject, body);
     }
 
-    public void sendBookingConfirmationWhatsApp(Booking booking) {
-        String message = String.format("🎉 Your booking %s is confirmed! View details at: http://localhost:3001/bookings", 
+    public void sendBookingConfirmationWhatsApp(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) return;
+        String message = String.format("🎉 Your booking %s is confirmed! View details at: https://carrental-system-mg.vercel.app/dashboard", 
                 booking.getBookingNumber());
         sendWhatsAppMessage(booking.getCustomer().getPhoneNumber(), message);
     }
 
-    public void sendPaymentConfirmationWhatsApp(Booking booking, com.carrental.entity.Payment payment, Bill bill) {
+    public void sendPaymentConfirmationWhatsApp(Long bookingId, Long paymentId, Long billId) {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        com.carrental.entity.Payment payment = paymentId != null ? paymentRepository.findById(paymentId).orElse(null) : null;
+        com.carrental.entity.Bill bill = billId != null ? billRepository.findById(billId).orElse(null) : null;
+        if (booking == null || payment == null) return;
+        
         StringBuilder sb = new StringBuilder();
         sb.append("✅ *PAYMENT CONFIRMED*\n");
         sb.append("Hi ").append(booking.getCustomer().getFirstName()).append(", your payment was successful!\n\n");
@@ -388,7 +408,9 @@ public class NotificationService {
         sendWhatsAppMessage(booking.getCustomer().getPhoneNumber(), sb.toString());
     }
 
-    public void sendBookingCancellationWhatsApp(Booking booking) {
+    public void sendBookingCancellationWhatsApp(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) return;
         String message = String.format("❌ Your booking %s has been cancelled. Any advance amount will be refunded. Thank you, MotoGlide.", 
                 booking.getBookingNumber());
         sendWhatsAppMessage(booking.getCustomer().getPhoneNumber(), message);

@@ -177,7 +177,7 @@ public class BookingService {
         // Send booking confirmation notifications (safe error handling)
         System.out.println("[DEBUG] Triggering async notification for booking: " + saved.getBookingNumber());
         try {
-            notificationService.sendBookingConfirmation(saved);
+            notificationService.sendBookingConfirmation(saved.getId());
         } catch (Throwable e) {
             System.err.println("[DEBUG] Async notification trigger failed: " + e.getMessage());
             e.printStackTrace();
@@ -342,7 +342,7 @@ public class BookingService {
         
         // Send cancellation email
         try {
-            notificationService.sendBookingCancellation(booking);
+            notificationService.sendBookingCancellation(booking.getId());
         } catch (Exception e) {
             System.err.println("Error sending cancellation email: " + e.getMessage());
         }
