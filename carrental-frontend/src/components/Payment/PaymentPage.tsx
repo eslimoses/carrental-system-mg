@@ -21,6 +21,7 @@ const PaymentPage: React.FC = () => {
   const [transactionId, setTransactionId] = useState('');
 
   const [paymentMethod, setPaymentMethod] = useState('CREDIT_CARD');
+  const [upiId, setUpiId] = useState('');
   const [showInvoice, setShowInvoice] = useState(false);
 
   const { processFullPayment, processAdvancePayment } = usePayments();
@@ -279,15 +280,15 @@ const PaymentPage: React.FC = () => {
             </h2>
             
             <div className="mb-10">
-              <h3 className="font-bold text-gray-400 uppercase text-xs tracking-widest mb-4">Choose Your Method</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <h3 className="font-bold text-gray-400 uppercase text-[10px] tracking-widest mb-4">Choose Your Method</h3>
+              <div className="flex flex-wrap gap-3">
                 {[
-                  {value: 'CREDIT_CARD', label: '💳 Credit Card'}, 
-                  {value: 'DEBIT_CARD', label: '💳 Debit Card'}, 
+                  {value: 'CREDIT_CARD', label: '💳 Credit'}, 
+                  {value: 'DEBIT_CARD', label: '💳 Debit'}, 
                   {value: 'UPI', label: '📱 UPI'}, 
                   {value: 'CASH', label: '💵 Cash'}
                 ].map(m => (
-                  <label key={m.value} className={`p-4 border-2 rounded-2xl cursor-pointer text-center transition-all ${paymentMethod === m.value ? 'border-blue-600 bg-blue-50/50 ring-4 ring-blue-50' : 'border-gray-100 hover:border-gray-300'}`}>
+                  <label key={m.value} className={`flex-1 min-w-[120px] p-4 border-2 rounded-2xl cursor-pointer text-center transition-all ${paymentMethod === m.value ? 'border-blue-600 bg-blue-50/50 ring-4 ring-blue-50' : 'border-gray-100 hover:border-gray-300'}`}>
                     <input type="radio" value={m.value} checked={paymentMethod === m.value} onChange={() => setPaymentMethod(m.value)} className="sr-only" />
                     <span className="text-sm font-black whitespace-nowrap">{m.label}</span>
                   </label>
@@ -295,11 +296,25 @@ const PaymentPage: React.FC = () => {
               </div>
             </div>
 
+            {/* UPI ID Input (Conditional) */}
+            {paymentMethod === 'UPI' && (
+              <div className="mb-8 animate-in slide-in-from-top duration-300">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Enter UPI ID</label>
+                <input 
+                  type="text" 
+                  value={upiId} 
+                  onChange={e => setUpiId(e.target.value)} 
+                  placeholder="e.g. yourname@upi" 
+                  className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-blue-500 focus:bg-white transition-all outline-none font-medium"
+                />
+              </div>
+            )}
+
             {/* Hint for Online Methods */}
             {(paymentMethod !== 'CASH') && (
               <div className="p-8 bg-blue-50/50 rounded-2xl border border-blue-100 mb-10 text-center">
-                <p className="text-blue-800 font-bold text-lg mb-2">Proceed with Razorpay</p>
-                <p className="text-blue-600/70 text-sm">You will be redirected to our secure payment partner to complete the transaction.</p>
+                <p className="text-blue-800 font-bold text-lg mb-2">Secure Checkout</p>
+                <p className="text-blue-600/70 text-sm">Redirecting to Razorpay for end-to-end encrypted processing.</p>
               </div>
             )}
 

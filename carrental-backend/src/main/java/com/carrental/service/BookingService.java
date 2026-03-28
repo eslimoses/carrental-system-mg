@@ -311,11 +311,13 @@ public class BookingService {
         
         // Restore vehicle availability
         Vehicle vehicle = booking.getVehicle();
-        vehicle.setStatus(VehicleStatus.AVAILABLE);
-        vehicleRepository.save(vehicle);
+        if (vehicle != null) {
+            vehicle.setStatus(VehicleStatus.AVAILABLE);
+            vehicleRepository.save(vehicle);
+        }
         
-        // Handle refund logic: If 1/3 payment (advance) was received, record it as amount returned
-        if (Boolean.TRUE.equals(booking.getAdvancePaid())) {
+        // Handle refund logic: If advance was received
+        if (Boolean.TRUE.equals(booking.getAdvancePaid()) && booking.getAdvanceAmount() != null) {
             booking.setAmountReturned(booking.getAdvanceAmount());
         }
         
@@ -329,7 +331,7 @@ public class BookingService {
         for (Payment p : successfulPayments) {
             Payment refund = new Payment();
             refund.setBooking(booking);
-            refund.setAmount(p.getAmount());
+            refund.setAmount(p.getAmount() != null ? p.getAmount() : BigDecimal.ZERO);
             refund.setPaymentType(Payment.PaymentType.REFUND);
             refund.setPaymentMethod(p.getPaymentMethod());
             refund.setTransactionId("RFD-" + java.util.UUID.randomUUID().toString().substring(0, 12).toUpperCase());
