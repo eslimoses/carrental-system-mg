@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/promo-codes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class PromoCodeController {
     private final PromoCodeRepository promoCodeRepository;
     private final com.carrental.repository.BookingRepository bookingRepository;

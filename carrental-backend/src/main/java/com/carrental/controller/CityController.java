@@ -15,7 +15,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/cities")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CityController {
     private final CityRepository cityRepository;
     private final VehicleRepository vehicleRepository;

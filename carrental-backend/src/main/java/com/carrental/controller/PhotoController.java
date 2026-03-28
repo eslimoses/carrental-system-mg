@@ -22,7 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/photos")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class PhotoController {
     private final VehiclePhotoRepository vehiclePhotoRepository;
     private final RentalPhotoRepository rentalPhotoRepository;
