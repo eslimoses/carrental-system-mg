@@ -449,57 +449,69 @@ public class NotificationService {
         sendWhatsAppMessage(booking.getCustomer().getPhoneNumber(), message);
     }
 
+    //@Async
     public void sendOtpEmail(String email, String otp) {
-        String subject = "📧 Verify Your Account - MotoGlide OTP";
-        
-        String htmlBody = "<!DOCTYPE html><html>"
-            + "<head><meta charset='UTF-8'></head>"
-            + "<body style='margin:0;padding:0;background-color:#f9fafb;font-family:\"Segoe UI\",Tahoma,Geneva,Verdana,sans-serif;'>"
-            + "<div style='max-width:500px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.05);border:1px solid #e5e7eb;'>"
-            // Gradient Header
-            + "<div style='background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);padding:40px 20px;text-align:center;'>"
-            + "<h1 style='color:#ffffff;margin:0;font-size:28px;font-weight:800;letter-spacing:-0.5px;'>Email Verification</h1>"
-            + "<p style='color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:15px;'>Car Rental System</p>"
-            + "</div>"
-            // Content
-            + "<div style='padding:40px 35px;'>"
-            + "<p style='font-size:16px;color:#374151;line-height:1.6;margin-top:0;'>Hello,</p>"
-            + "<p style='font-size:15px;color:#4b5563;line-height:1.6;'>Thank you for choosing <strong>MotoGlide</strong>! To complete your registration and secure your account, please use the verification code below:</p>"
-            
-            // OTP Box
-            + "<div style='margin:35px 0;text-align:center;background:#f3f4f6;border-radius:12px;padding:30px;border:2px dashed #6366f1;'>"
-            + "<span style='font-family:monospace;font-size:42px;font-weight:900;letter-spacing:12px;color:#4f46e5;text-shadow:1px 1px 0px #fff;'>" + otp + "</span>"
-            + "</div>"
-            
-            + "<p style='font-size:14px;color:#6b7280;text-align:center;'>This OTP is valid for <strong>" + 5 + " minutes</strong>. For security, please do not share this code with anyone.</p>"
-            + "</div>"
-            
-            // Footer
-            + "<div style='padding:25px;background:#f9fafb;text-align:center;border-top:1px solid #f3f4f6;'>"
-            + "<p style='margin:0;font-size:12px;color:#9ca3af;'>If you didn't request this, you can safely ignore this email.</p>"
-            + "<p style='margin:10px 0 0;font-size:12px;color:#9ca3af;font-weight:bold;'>© 2026 MotoGlide Car Rental</p>"
-            + "</div>"
-            + "</div></body></html>";
-
+        System.out.println("==========================================");
+        System.out.println("📩 [DEBUG] STARTING SYNCHRONOUS OTP EMAIL");
+        System.out.println("📧 To: " + email);
+        System.out.println("🔑 Code: " + otp);
+        System.out.println("==========================================");
         try {
+            String subject = "📧 Verify Your Account - MotoGlide OTP";
+            
+            String htmlBody = "<!DOCTYPE html><html>"
+                + "<head><meta charset='UTF-8'></head>"
+                + "<body style='margin:0;padding:0;background-color:#f9fafb;font-family:\"Segoe UI\",Tahoma,Geneva,Verdana,sans-serif;'>"
+                + "<div style='max-width:500px;margin:40px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.05);border:1px solid #e5e7eb;'>"
+                // Gradient Header
+                + "<div style='background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);padding:40px 20px;text-align:center;'>"
+                + "<h1 style='color:#ffffff;margin:0;font-size:28px;font-weight:800;letter-spacing:-0.5px;'>Email Verification</h1>"
+                + "<p style='color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:15px;'>Car Rental System</p>"
+                + "</div>"
+                // Content
+                + "<div style='padding:40px 35px;'>"
+                + "<p style='font-size:16px;color:#374151;line-height:1.6;margin-top:0;'>Hello,</p>"
+                + "<p style='font-size:15px;color:#4b5563;line-height:1.6;'>Thank you for choosing <strong>MotoGlide</strong>! To complete your registration and secure your account, please use the verification code below:</p>"
+                
+                // OTP Box
+                + "<div style='margin:35px 0;text-align:center;background:#f3f4f6;border-radius:12px;padding:30px;border:2px dashed #6366f1;'>"
+                + "<span style='font-family:monospace;font-size:42px;font-weight:900;letter-spacing:12px;color:#4f46e5;text-shadow:1px 1px 0px #fff;'>" + otp + "</span>"
+                + "</div>"
+                
+                + "<p style='font-size:14px;color:#6b7280;text-align:center;'>This OTP is valid for <strong>" + 5 + " minutes</strong>. For security, please do not share this code with anyone.</p>"
+                + "</div>"
+                
+                // Footer
+                + "<div style='padding:25px;background:#f9fafb;text-align:center;border-top:1px solid #f3f4f6;'>"
+                + "<p style='margin:0;font-size:12px;color:#9ca3af;'>If you didn't request this, you can safely ignore this email.</p>"
+                + "<p style='margin:10px 0 0;font-size:12px;color:#9ca3af;font-weight:bold;'>© 2026 MotoGlide Car Rental</p>"
+                + "</div>"
+                + "</div></body></html>";
+    
             if (mailSender == null) {
-                System.out.println("Mail sender not found. Skipping email verification step for: " + email);
-                System.out.println("BYPASS: OTP is " + otp);
+                System.out.println("[ASYNC-ERROR] Mail sender not found. Skipping email verification for: " + email);
+                System.out.println("[DEBUG] BYPASS OTP is: " + otp);
                 return;
             }
+            
+            System.out.println("[ASYNC] Composing OTP MimeMessage to: " + email);
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromEmail);
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
+            System.out.println("🚀 [DEBUG] Calling mailSender.send(message)...");
             mailSender.send(message);
+            System.out.println("✅ [DEBUG] OTP SUCCESS: Email sent to " + email);
         } catch (Throwable e) {
-            System.err.println("Failed to send OTP email (likely missing config): " + e.getMessage());
+            System.err.println("❌ [DEBUG] OTP ERROR: " + e.getMessage());
+            e.printStackTrace();
             System.out.println("NOTICE: Registration is continuing without email delivery.");
         }
     }
 
+    @Async
     public void sendWhatsAppMessage(String toPhoneNumber, String messageText) {
         System.out.println("[DEBUG] Attempting to send WhatsApp message to: " + toPhoneNumber);
         try {
@@ -532,6 +544,7 @@ public class NotificationService {
      * @param offer - the PromoCode entity
      * @param targetEmail - null means ALL customers; non-null means specific email
      */
+    @Async
     public void sendOfferNotification(com.carrental.entity.PromoCode offer, String targetEmail) {
         String subject = "🎉 Exclusive Offer Just for You! " + offer.getDiscountPercentage() + "% OFF | MotoGlide";
 

@@ -181,7 +181,7 @@ const SuperAdminDashboard: React.FC = () => {
                        const emailInput = document.getElementById('admin-report-email') as HTMLInputElement;
                        const email = emailInput?.value;
                        if(email) {
-                          fetch(`https://carrental-system-mg-production.up.railway.app/api/admin/reports/financial/email?email=${encodeURIComponent(email)}`, {
+                          fetch(`${import.meta.env.VITE_API_URL}/admin/reports/financial/email?email=${encodeURIComponent(email)}`, {
                              method: 'POST',
                              headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                           })
@@ -198,7 +198,7 @@ const SuperAdminDashboard: React.FC = () => {
                </div>
                <button 
                 onClick={() => {
-                   window.open(`https://carrental-system-mg-production.up.railway.app/api/admin/reports/financial/download`, '_blank');
+                   window.open(`${import.meta.env.VITE_API_URL}/admin/reports/financial/download`, '_blank');
                 }}
                 className="md:w-64 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 border-b-4 border-emerald-800 active:border-b-0 transition-all uppercase tracking-widest text-sm"
               >
@@ -735,7 +735,7 @@ const SuperAdminDashboard: React.FC = () => {
                                    <button 
                                      onClick={() => {
                                        if(window.confirm('Mark this vehicle as available? This will clear maintenance status.')) {
-                                         fetch(`https://carrental-system-mg-production.up.railway.app/api/vehicles/${v.id}`, {
+                                         fetch(`${import.meta.env.VITE_API_URL}/vehicles/${v.id}`, {
                                            method: 'PUT',
                                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                                            body: JSON.stringify({ ...v, cityId: v.city?.id || v.cityId, categoryId: v.category?.id || v.categoryId, status: 'AVAILABLE', maintenanceWorkRequired: '' })
@@ -1237,7 +1237,7 @@ const SuperAdminDashboard: React.FC = () => {
                         if(!date) return alert('Please select a date');
                         
                         // 1. Update Vehicle Compliance first
-                        fetch(`https://carrental-system-mg-production.up.railway.app/api/admin/vehicles/${selectedVehicleForMaintenance.id}`, {
+                        fetch(`${import.meta.env.VITE_API_URL}/admin/vehicles/${selectedVehicleForMaintenance.id}`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1252,7 +1252,7 @@ const SuperAdminDashboard: React.FC = () => {
                             })
                         }).then(() => {
                            // 2. Schedule Maintenance Record
-                           return fetch('https://carrental-system-mg-production.up.railway.app/api/admin/maintenance', {
+                           return fetch(`${import.meta.env.VITE_API_URL}/admin/maintenance`, {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({

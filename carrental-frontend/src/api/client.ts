@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_BASE_URL = 'https://carrental-system-mg-production.up.railway.app/api';
+const API_BASE_URL = 'http://localhost:9091/api';
 
 const client: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,

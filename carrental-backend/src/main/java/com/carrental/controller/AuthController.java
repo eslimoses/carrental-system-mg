@@ -22,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 @CrossOrigin(origins = "*")
 public class AuthController {
     private final UserService userService;
+    private final com.carrental.repository.UserRepository userRepository;
     private final com.carrental.service.NotificationService notificationService;
     private final com.carrental.service.JwtService jwtService;
     
@@ -133,6 +134,10 @@ public class AuthController {
     
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
+        System.out.println("==========================================");
+        System.out.println("🚀 [API] HIT: /api/auth/send-otp");
+        System.out.println("📩 Request Data: " + request);
+        System.out.println("==========================================");
         try {
             String phoneNumber = request.get("phoneNumber");
             String email = request.get("email");
@@ -179,27 +184,31 @@ public class AuthController {
     
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
+        String phoneNumber = request.get("phoneNumber");
+        String otp = request.get("otp");
+        System.out.println("[DEBUG] Verification attempt for phone: " + phoneNumber + " with code: " + otp);
+
         try {
-            String phoneNumber = request.get("phoneNumber");
-            String otp = request.get("otp");
-            String email = request.get("email");
-            String password = request.get("password");
-            
             // Check if OTP exists
-            if (!otpStorage.containsKey(phoneNumber)) {
+            if (phoneNumber == null || !otpStorage.containsKey(phoneNumber)) {
+                System.out.println("[DEBUG] Verification failed: Phone number not found in OTP cache.");
                 Map<String, String> error = new HashMap<>();
-                error.put("message", "OTP not found. Please request a new OTP.");
+                error.put("message", "OTP not found for this phone number. Please request a new code.");
                 return ResponseEntity.badRequest().body(error);
             }
             
             Map<String, Object> otpData = otpStorage.get(phoneNumber);
             String storedOtp = (String) otpData.get("otp");
             LocalDateTime timestamp = (LocalDateTime) otpData.get("timestamp");
+            String storedEmail = (String) otpData.get("email");
+
+            System.out.println("[DEBUG] Stored OTP was: " + storedOtp + " for email: " + storedEmail);
             
             // Check OTP validity
             long minutesPassed = ChronoUnit.MINUTES.between(timestamp, LocalDateTime.now());
             if (minutesPassed > OTP_VALIDITY_MINUTES) {
                 otpStorage.remove(phoneNumber);
+                System.out.println("[DEBUG] Verification failed: OTP expired.");
                 Map<String, String> error = new HashMap<>();
                 error.put("message", "OTP expired. Please request a new OTP.");
                 return ResponseEntity.badRequest().body(error);
@@ -207,26 +216,39 @@ public class AuthController {
             
             // Verify OTP
             if (!storedOtp.equals(otp)) {
+                System.out.println("[DEBUG] Verification failed: Code mismatch.");
                 Map<String, String> error = new HashMap<>();
-                error.put("message", "Invalid OTP. Please try again.");
+                error.put("message", "Invalid OTP code. Please try again.");
                 return ResponseEntity.badRequest().body(error);
             }
             
             // OTP verified successfully
+            System.out.println("[DEBUG] OTP Verified Successfully. Removing from cache.");
             otpStorage.remove(phoneNumber);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "OTP verified successfully");
             
-            // Try to find user to generate a real token
-            User user = userService.getUserByEmail(email);
-            if (user != null) {
-                response.put("token", jwtService.generateToken(user));
+            // Use storedEmail for token generation
+            if (storedEmail != null) {
+                System.out.println("[DEBUG] Generating token for: " + storedEmail);
+                // Safe lookup: don't throw if missing, it's normal for new signups
+                User user = userRepository.findByEmail(storedEmail).orElse(null);
+                if (user != null) {
+                    response.put("token", jwtService.generateToken(user));
+                    response.put("isExistingUser", true);
+                } else {
+                    response.put("token", "verification-success-token-" + System.currentTimeMillis());
+                    response.put("isExistingUser", false);
+                }
             } else {
                 response.put("token", "verification-success-token-" + System.currentTimeMillis());
             }
+            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("[ERROR] Failed to verify OTP: " + e.getMessage());
+            e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("message", "Error verifying OTP: " + e.getMessage());
             return ResponseEntity.badRequest().body(error);

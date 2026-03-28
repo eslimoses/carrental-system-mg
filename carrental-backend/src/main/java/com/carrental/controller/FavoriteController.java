@@ -20,6 +20,7 @@ public class FavoriteController {
 
     @PostMapping("/{userId}/{vehicleId}")
     public ResponseEntity<?> addFavorite(@PathVariable Long userId, @PathVariable Long vehicleId) {
+        System.out.println("🚀 [API] HIT: ADD FAVORITE - User: " + userId + ", Vehicle: " + vehicleId);
         try {
             Favorite favorite = favoriteService.addFavorite(userId, vehicleId);
             Map<String, Object> response = new HashMap<>();
@@ -27,6 +28,8 @@ public class FavoriteController {
             response.put("favorite", favorite);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("❌ [API] FAILED ADD FAVORITE: " + e.getMessage());
+            e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(error);
@@ -35,12 +38,15 @@ public class FavoriteController {
 
     @DeleteMapping("/{userId}/{vehicleId}")
     public ResponseEntity<?> removeFavorite(@PathVariable Long userId, @PathVariable Long vehicleId) {
+        System.out.println("🚀 [API] HIT: REMOVE FAVORITE - User: " + userId + ", Vehicle: " + vehicleId);
         try {
             favoriteService.removeFavorite(userId, vehicleId);
             Map<String, String> response = new HashMap<>();
             response.put("message", "Vehicle removed from favorites");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("❌ [API] FAILED REMOVE FAVORITE: " + e.getMessage());
+            e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(error);
